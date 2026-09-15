@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Un pequeño universo para ti</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Música ambiental. Coloca tu archivo "musica.mp3" en esta misma carpeta. -->
+  <audio id="bg-music" loop preload="none">
+    <source src="musica.mp3" type="audio/mpeg" />
+  </audio>
+
+  <button id="musicToggle" class="music-toggle muted" aria-label="Activar o silenciar música">
+    <span id="musicIcon">♫</span>
+  </button>
+
+  <canvas id="starsCanvas"></canvas>
+  <canvas id="heartCanvas"></canvas>
+
+  <div class="galaxy"></div>
+  <div class="galaxy galaxy-2"></div>
+
+  <main id="universeScene" class="universe-scene">
+
+    <section id="introSection" class="intro-section">
+      <p class="eyebrow">✦ &nbsp; un regalo hecho de estrellas &nbsp; ✦</p>
+      <h1 class="intro-title">Hice un pequeño universo para ti…</h1>
+      <p class="intro-subtitle">Porque no existen suficientes palabras para decirte lo importante que eres para mí.</p>
+    </section>
+
+    <div class="gift-scene" id="giftScene">
+      <div class="box-shadow"></div>
+
+      <div class="gift-box" id="giftBox" role="button" tabindex="0" aria-label="Abrir el regalo">
+        <div class="box-glow" id="boxGlow"></div>
+
+        <div class="box-base">
+          <div class="box-side box-side-left"></div>
+          <div class="box-side box-side-right"></div>
+          <div class="box-front">
+            <div class="ribbon-vertical"></div>
+          </div>
+        </div>
+
+        <div class="box-lid" id="boxLid">
+          <div class="lid-top">
+            <div class="ribbon-vertical ribbon-vertical-lid"></div>
+          </div>
+          <div class="lid-edge"></div>
+        </div>
+
+        <div class="bow" id="bow">
+          <div class="bow-loop bow-loop-left"></div>
+          <div class="bow-loop bow-loop-right"></div>
+          <div class="bow-knot"></div>
+          <div class="bow-tail bow-tail-left"></div>
+          <div class="bow-tail bow-tail-right"></div>
+        </div>
+      </div>
+
+      <p class="hint-text" id="hintText">Haz clic en el regalo ✨</p>
+    </div>
+
+    <div class="phrases-layer" id="phrasesLayer" aria-hidden="true"></div>
+
+  </main>
+
+  <section id="finale" class="finale" aria-hidden="true">
+    <div class="finale-message" id="finaleMessage"></div>
+    <button id="replayBtn" class="replay-btn">↻ &nbsp;Vivir este momento otra vez</button>
+  </section>
+
+  <div id="clickLayer" class="click-layer"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
