@@ -236,19 +236,12 @@
     'Tú puedes con todo. Nunca olvides lo fuerte, valiente y capaz que eres.',
     'Eres una mujer maravillosa, y me siento muy afortunado de compartir mi vida contigo.',
     'Me encanta tu forma de ser, incluso esas pequeñas cosas que quizá tú misma no notas.',
-    'Quiero que nunca olvides lo increíble que eres.',
-    'Admiro tu manera de luchar por lo que quieres y seguir adelante.',
     'Ojalá pudieras verte con mis ojos para entender lo especial que eres para mí.',
     'Gracias por llegar a mi vida y hacerla mucho más bonita.',
-    'No quiero que olvides nunca que creo en ti.',
     'Cuando tengas un día difícil, recuerda que hay alguien que te admira, te quiere y cree muchísimo en ti.',
-    'Eres mucho más fuerte de lo que a veces piensas.',
     'Me encanta poder compartir momentos, risas y sueños contigo.',
-    'Si pudiera elegir nuevamente, volvería a elegir encontrarte.',
     'Contigo hasta los días grises se sienten más ligeros.',
-    'Eres mi lugar favorito para volver, sin importar el día.',
-    'Cada vez que dudes de ti, yo voy a estar aquí recordándote quién eres.',
-    'Gracias por ser exactamente como eres, sin filtros ni máscaras.',
+    'Si pudiera elegir nuevamente, volvería a elegir encontrarte.',
   ];
 
   function spawnAmbientSparkles() {
@@ -609,7 +602,7 @@
     await wait(2300);
     await fadeOutFinaleLine();
 
-    await showFinaleLine('Te quiero muchísimo.', {
+    await showFinaleLine('Te adoro mucho.', {
       subtitle: 'Siempre voy a estar orgulloso de la mujer que eres.',
     });
     await wait(1400);
