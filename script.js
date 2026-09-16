@@ -222,10 +222,13 @@
      ========================================================= */
 
   const giftBox = document.getElementById('giftBox');
+  const giftScene = document.getElementById('giftScene');
+  const introSection = document.getElementById('introSection');
   const bow = document.getElementById('bow');
   const hintText = document.getElementById('hintText');
   const phrasesLayer = document.getElementById('phrasesLayer');
   const universeScene = document.getElementById('universeScene');
+  const isMobileLayout = () => window.innerWidth < 640;
 
   const phrases = [
     'Eres de las cosas más bonitas que la vida puso en mi camino.',
@@ -337,6 +340,29 @@
     }
   }
 
+  async function revealPhrasesMobile() {
+    giftScene.classList.add('faded');
+    await wait(500);
+
+    for (const text of phrases) {
+      const card = document.createElement('div');
+      card.className = 'phrase-card centered';
+
+      const inner = document.createElement('span');
+      inner.className = 'phrase-card-inner';
+      inner.textContent = text;
+      card.appendChild(inner);
+
+      phrasesLayer.appendChild(card);
+      requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('visible')));
+
+      await wait(prefersReducedMotion ? 300 : 1700);
+      card.classList.remove('visible');
+      await wait(prefersReducedMotion ? 100 : 650);
+      card.remove();
+    }
+  }
+
   let boxOpened = false;
 
   async function openGift() {
@@ -344,6 +370,7 @@
     boxOpened = true;
 
     hintText.classList.add('hidden');
+    introSection.classList.add('faded');
     giftBox.classList.add('opened');
     playChime();
 
@@ -356,7 +383,11 @@
     spawnBurstParticles();
 
     await wait(900);
-    await revealPhrases();
+    if (isMobileLayout()) {
+      await revealPhrasesMobile();
+    } else {
+      await revealPhrases();
+    }
 
     await wait(2200);
     startFinale();

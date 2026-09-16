@@ -113,6 +113,11 @@ html, body{
 .intro-section{
   margin-bottom: 4vh;
   max-width: 640px;
+  transition: opacity 0.9s ease;
+}
+.intro-section.faded{
+  opacity: 0;
+  pointer-events: none;
 }
 
 .eyebrow{
@@ -159,6 +164,11 @@ html, body{
   display: flex;
   flex-direction: column;
   align-items: center;
+  transition: opacity 0.9s ease;
+}
+.gift-scene.faded{
+  opacity: 0;
+  pointer-events: none;
 }
 
 .box-shadow{
@@ -437,6 +447,22 @@ html, body{
 .phrase-card.visible{
   opacity: 1;
   transform: translate(-50%, 0) scale(1) rotate(var(--r, 0deg));
+}
+
+/* Modo secuencial (móvil): una frase centrada a la vez, sin superposición */
+.phrase-card.centered{
+  left: 50%;
+  top: 50%;
+  width: min(88vw, 380px);
+  max-width: 88vw;
+  transform: translate(-50%, -50%) scale(0.9);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.phrase-card.centered.visible{
+  transform: translate(-50%, -50%) scale(1);
+}
+.phrase-card.centered .phrase-card-inner{
+  animation: none;
 }
 
 .phrase-card-inner{
