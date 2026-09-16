@@ -458,6 +458,8 @@
   }
   resizeHeartCanvas();
 
+  const HEART_COLORS = ['#f9a8d4', '#f9a8d4', '#fde68a', '#f5f3ff'];
+
   function heartPoint(t, scale, cx, cy) {
     const x = 16 * Math.pow(Math.sin(t), 3);
     const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
@@ -470,18 +472,21 @@
     const cx = w / 2;
     const cy = h / 2;
     const scale = Math.min(w, h) / 34;
-    const count = prefersReducedMotion ? 60 : 150;
+    const count = prefersReducedMotion ? 60 : 190;
 
     heartParticles = [];
     for (let i = 0; i < count; i++) {
       const t = (i / count) * Math.PI * 2;
       const target = heartPoint(t, scale, cx, cy);
+      const big = i % 7 === 0;
       heartParticles.push({
         x: rand(0, w),
         y: rand(0, h),
         tx: target.x,
         ty: target.y,
-        r: rand(1.2, 2.6),
+        r: big ? rand(2.6, 3.6) : rand(1.1, 2.1),
+        big,
+        color: HEART_COLORS[Math.floor(Math.random() * HEART_COLORS.length)],
         phase: rand(0, Math.PI * 2),
       });
     }
@@ -489,6 +494,30 @@
 
   function easeInOutCubic(x) {
     return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+  }
+
+  function drawHeartStar(x, y, r, color, twinkle, big) {
+    heartCtx.beginPath();
+    heartCtx.fillStyle = color;
+    heartCtx.shadowColor = color;
+    heartCtx.shadowBlur = big ? 18 : 8;
+    heartCtx.globalAlpha = 0.45 + twinkle * 0.55;
+    heartCtx.arc(x, y, r, 0, Math.PI * 2);
+    heartCtx.fill();
+
+    if (big) {
+      heartCtx.strokeStyle = color;
+      heartCtx.lineWidth = 0.8;
+      heartCtx.globalAlpha = 0.2 + twinkle * 0.3;
+      heartCtx.beginPath();
+      heartCtx.moveTo(x - r * 3.4, y);
+      heartCtx.lineTo(x + r * 3.4, y);
+      heartCtx.moveTo(x, y - r * 3.4);
+      heartCtx.lineTo(x, y + r * 3.4);
+      heartCtx.stroke();
+    }
+    heartCtx.globalAlpha = 1;
+    heartCtx.shadowBlur = 0;
   }
 
   function animateHeartFormation(duration) {
@@ -504,12 +533,7 @@
           const x = p.x + (p.tx - p.x) * eased;
           const y = p.y + (p.ty - p.y) * eased;
           const twinkle = 0.6 + Math.sin(now / 400 + p.phase) * 0.4;
-          heartCtx.beginPath();
-          heartCtx.fillStyle = `rgba(244, 114, 182, ${0.5 + twinkle * 0.5})`;
-          heartCtx.shadowColor = 'rgba(244, 114, 182, 0.8)';
-          heartCtx.shadowBlur = 8;
-          heartCtx.arc(x, y, p.r, 0, Math.PI * 2);
-          heartCtx.fill();
+          drawHeartStar(x, y, p.r, p.color, twinkle, p.big);
         }
 
         if (progress < 1) {
@@ -526,16 +550,57 @@
   function keepHeartTwinkling() {
     function loop(now) {
       if (!heartCanvas.classList.contains('visible')) return;
-      heartCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      const cx = w / 2;
+      const cy = h / 2;
+      const breath = prefersReducedMotion ? 1 : 1 + Math.sin(now / 1600) * 0.025;
+
+      heartCtx.clearRect(0, 0, w, h);
+
+      // resplandor tipo nebulosa detrás del contorno
+      heartCtx.save();
+      heartCtx.filter = 'blur(24px)';
+      heartCtx.beginPath();
+      heartParticles.forEach((p, i) => {
+        const x = cx + (p.tx - cx) * breath;
+        const y = cy + (p.ty - cy) * breath;
+        if (i === 0) heartCtx.moveTo(x, y);
+        else heartCtx.lineTo(x, y);
+      });
+      heartCtx.closePath();
+      const glow = heartCtx.createRadialGradient(cx, cy, 10, cx, cy, Math.max(w, h) / 2.6);
+      glow.addColorStop(0, 'rgba(244, 114, 182, 0.4)');
+      glow.addColorStop(0.55, 'rgba(139, 92, 246, 0.18)');
+      glow.addColorStop(1, 'rgba(244, 114, 182, 0)');
+      heartCtx.fillStyle = glow;
+      heartCtx.fill();
+      heartCtx.restore();
+
+      // contorno de constelación uniendo las estrellas
+      heartCtx.beginPath();
+      heartParticles.forEach((p, i) => {
+        const x = cx + (p.tx - cx) * breath;
+        const y = cy + (p.ty - cy) * breath;
+        if (i === 0) heartCtx.moveTo(x, y);
+        else heartCtx.lineTo(x, y);
+      });
+      heartCtx.closePath();
+      heartCtx.strokeStyle = 'rgba(249, 168, 212, 0.3)';
+      heartCtx.lineWidth = 1;
+      heartCtx.shadowColor = 'rgba(244, 114, 182, 0.45)';
+      heartCtx.shadowBlur = 6;
+      heartCtx.stroke();
+      heartCtx.shadowBlur = 0;
+
+      // estrellas individuales
       for (const p of heartParticles) {
+        const x = cx + (p.tx - cx) * breath;
+        const y = cy + (p.ty - cy) * breath;
         const twinkle = 0.6 + Math.sin(now / 400 + p.phase) * 0.4;
-        heartCtx.beginPath();
-        heartCtx.fillStyle = `rgba(244, 114, 182, ${0.5 + twinkle * 0.5})`;
-        heartCtx.shadowColor = 'rgba(244, 114, 182, 0.8)';
-        heartCtx.shadowBlur = 8;
-        heartCtx.arc(p.tx, p.ty, p.r, 0, Math.PI * 2);
-        heartCtx.fill();
+        drawHeartStar(x, y, p.r, p.color, twinkle, p.big);
       }
+
       requestAnimationFrame(loop);
     }
     requestAnimationFrame(loop);
