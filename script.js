@@ -251,6 +251,28 @@
     'Gracias por ser exactamente como eres, sin filtros ni máscaras.',
   ];
 
+  function spawnAmbientSparkles() {
+    const count = window.innerWidth < 640 ? 5 : 8;
+    const sparkles = [];
+    for (let i = 0; i < count; i++) {
+      const s = document.createElement('span');
+      s.className = 'ambient-sparkle';
+      s.textContent = '✦';
+      const angle = (i / count) * Math.PI * 2 + rand(-0.3, 0.3);
+      const radius = rand(85, 145);
+      s.style.left = `calc(50% + ${Math.cos(angle) * radius}px)`;
+      s.style.top = `calc(42% + ${Math.sin(angle) * radius * 0.55}px)`;
+      s.style.fontSize = rand(8, 14) + 'px';
+      s.style.animationDuration = rand(2.5, 4.5) + 's';
+      s.style.animationDelay = rand(0, 3) + 's';
+      giftScene.appendChild(s);
+      sparkles.push(s);
+    }
+    return sparkles;
+  }
+
+  const ambientSparkles = prefersReducedMotion ? [] : spawnAmbientSparkles();
+
   function spawnBurstParticles() {
     const rect = giftBox.getBoundingClientRect();
     const originX = rect.left + rect.width / 2;
@@ -309,13 +331,18 @@
     const isMobile = window.innerWidth < 640;
     // El card se centra en (left, top) vía translate(-50%, ..), así que estos
     // márgenes garantizan que ni el ancho (max-width) ni el alto se salgan del viewport.
-    const left = isMobile ? rand(42, 58) : rand(18, 82);
+    const left = isMobile ? rand(42, 58) : rand(21, 79);
     const top = isMobile ? rand(10, 85) : rand(8, 85);
     const rotation = rand(-7, 7);
 
     card.style.left = left + 'vw';
     card.style.top = top + 'vh';
     card.style.setProperty('--r', rotation + 'deg');
+
+    const ornament = document.createElement('span');
+    ornament.className = 'card-ornament';
+    ornament.textContent = '✦';
+    card.appendChild(ornament);
 
     const inner = document.createElement('span');
     inner.className = 'phrase-card-inner';
@@ -336,31 +363,46 @@
     const order = [...phrases];
     for (let i = 0; i < order.length; i++) {
       placePhraseCard(order[i], i);
-      await wait(prefersReducedMotion ? 250 : 950);
+      await wait(prefersReducedMotion ? 250 : 1350);
     }
   }
 
   async function revealPhrasesMobile() {
     giftScene.classList.add('faded');
-    await wait(500);
+    await wait(600);
 
-    for (const text of phrases) {
+    const progress = document.createElement('div');
+    progress.className = 'phrase-progress';
+    phrasesLayer.appendChild(progress);
+    requestAnimationFrame(() => requestAnimationFrame(() => progress.classList.add('visible')));
+
+    for (let i = 0; i < phrases.length; i++) {
       const card = document.createElement('div');
       card.className = 'phrase-card centered';
 
+      const ornament = document.createElement('span');
+      ornament.className = 'card-ornament';
+      ornament.textContent = '✦';
+      card.appendChild(ornament);
+
       const inner = document.createElement('span');
       inner.className = 'phrase-card-inner';
-      inner.textContent = text;
+      inner.textContent = phrases[i];
       card.appendChild(inner);
 
       phrasesLayer.appendChild(card);
+      progress.textContent = `${i + 1} / ${phrases.length}`;
       requestAnimationFrame(() => requestAnimationFrame(() => card.classList.add('visible')));
 
-      await wait(prefersReducedMotion ? 300 : 1700);
+      await wait(prefersReducedMotion ? 300 : 3400);
       card.classList.remove('visible');
-      await wait(prefersReducedMotion ? 100 : 650);
+      await wait(prefersReducedMotion ? 100 : 950);
       card.remove();
     }
+
+    progress.classList.remove('visible');
+    await wait(500);
+    progress.remove();
   }
 
   let boxOpened = false;
@@ -372,6 +414,11 @@
     hintText.classList.add('hidden');
     introSection.classList.add('faded');
     giftBox.classList.add('opened');
+    ambientSparkles.forEach((s) => {
+      s.style.animation = 'none';
+      s.style.opacity = '0';
+      setTimeout(() => s.remove(), 650);
+    });
     playChime();
 
     bow.classList.add('untied');
